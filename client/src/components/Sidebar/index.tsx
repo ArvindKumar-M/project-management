@@ -1,5 +1,5 @@
 "use client";
-import Timeline from "@/app/projects/TimelineView";
+
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsSidebarCollapsed } from "@/state";
 import { useGetProjectsQuery } from "@/state/api";
@@ -35,7 +35,6 @@ const Sidebar = () => {
   const isSidebarCollapsed = useAppSelector(
     (state) => state.global.isSidebarCollapsed,
   );
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl 
     transition-all duration-300 h-full z-40 dark:bg-black overflow-y-auto bg-white
