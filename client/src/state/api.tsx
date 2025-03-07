@@ -121,8 +121,8 @@ export const api = createApi({
           const userDetails = userDetailsResponse.data as User;
 
           return { data: { user, userSub, userDetails } };
-        } catch (error: any) {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error: any) {
           return { error: error.message || "Could not fetch user data" };
         }
       },
