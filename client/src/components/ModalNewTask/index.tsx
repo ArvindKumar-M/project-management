@@ -27,7 +27,6 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
   const [newTaskData, setNewTaskData] = useState(INITIAL_TASK_DATA);
 
   const handleSubmit = async () => {
-    console.log("first");
     if (
       !newTaskData.title ||
       !newTaskData.authorUserId ||

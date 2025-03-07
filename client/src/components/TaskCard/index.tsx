@@ -19,7 +19,7 @@ const TaskCard = ({ task }: Props) => {
             {task.attachments && task.attachments.length > 0 && (
               <div className="relative overflow-hidden rounded-md">
                 <Image
-                  src={`/${task.attachments[0].fileURL}`}
+                  src={`https://pm-s3-all-images.s3.us-east-1.amazonaws.com/${task.attachments[0].fileURL}`}
                   alt={task.attachments[0].fileName}
                   width={400}
                   height={200}
