@@ -50,7 +50,7 @@ const AuthProvider = ({ children }: Props) => {
   return (
     <div className="">
       <Authenticator formFields={formFields}>
-        {({ user }: any) =>
+        {({ user }) =>
           user ? (
             <div>{children}</div>
           ) : (
