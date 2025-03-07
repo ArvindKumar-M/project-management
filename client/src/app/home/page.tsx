@@ -91,7 +91,8 @@ const HomePage = () => {
       };
 
   if (isTasksLoading || isProjectsLoading) return <Loading />;
-  if (tasksError || !tasks || !projects) return <div>Error fetching data</div>;
+  if (tasksError || !tasks || !projects)
+    return <ErrorAlert error="Error fetching data." />;
 
   return (
     <div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
