@@ -162,8 +162,8 @@ const Sidebar = () => {
           </>
         )}
       </div>
-      <div className="px- z-10 mt-32 flex w-full flex-col items-center gap-4 bg-white py-4 dark:bg-black md:hidden">
-        <div className="hidden items-center justify-between md:flex">
+      <div className="z-10 mt-32 flex w-full flex-col items-center gap-4 bg-white px-8 py-4 dark:bg-black md:hidden">
+        <div className="flex w-full items-center">
           <div className="align-center flex h-9 w-9 justify-center">
             {!!currentUserDetails?.profilePictureUrl ? (
               <Image
