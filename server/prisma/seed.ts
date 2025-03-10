@@ -34,7 +34,7 @@ async function main() {
     "comment.json",
   ];
 
-  await deleteAllData(orderedFileNames.reverse()); //Ensure tasks are deleted before projects
+  await deleteAllData(orderedFileNames.reverse()); // Ensure dependencies are deleted first
 
   for (const fileName of orderedFileNames) {
     const filePath = path.join(dataDirectory, fileName);
@@ -43,9 +43,28 @@ async function main() {
     const model: any = prisma[modelName as keyof typeof prisma];
 
     try {
-      for (const data of jsonData) {
-        await model.create({ data });
+      if (modelName === "task") {
+        // Ensure all tasks are committed before inserting comments
+        await prisma.$transaction(async (prisma) => {
+          for (const data of jsonData) {
+            await prisma.task.create({ data });
+          }
+        });
+        console.log("Task seeding completed");
+      } else if (modelName === "comment") {
+        // Ensure tasks exist before inserting comments
+        await prisma.$transaction(async (prisma) => {
+          for (const data of jsonData) {
+            await prisma.comment.create({ data });
+          }
+        });
+        console.log("Comment seeding completed");
+      } else {
+        for (const data of jsonData) {
+          await model.create({ data });
+        }
       }
+
       console.log(`Seeded ${modelName} with data from ${fileName}`);
     } catch (error) {
       console.error(`Error seeding data for ${modelName}:`, error);
