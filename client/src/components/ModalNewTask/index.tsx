@@ -86,7 +86,7 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
     return (
       newTaskData.title &&
       newTaskData.authorUserId &&
-      !(id !== null || newTaskData.projectId)
+      (id !== null || newTaskData.projectId)
     );
   };
 
