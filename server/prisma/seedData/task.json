@@ -9,8 +9,8 @@
     "startDate": "2023-01-10T00:00:00Z",
     "dueDate": "2023-04-10T00:00:00Z",
     "projectId": 1,
-    "authorUserId": 1,
-    "assignedUserId": 2
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 2,
@@ -22,8 +22,8 @@
     "startDate": "2023-01-15T00:00:00Z",
     "dueDate": "2023-05-15T00:00:00Z",
     "projectId": 2,
-    "authorUserId": 3,
-    "assignedUserId": 4
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 3,
@@ -35,8 +35,8 @@
     "startDate": "2023-03-20T00:00:00Z",
     "dueDate": "2023-09-20T00:00:00Z",
     "projectId": 3,
-    "authorUserId": 5,
-    "assignedUserId": 6
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 4,
@@ -48,8 +48,8 @@
     "startDate": "2023-01-25T00:00:00Z",
     "dueDate": "2023-06-25T00:00:00Z",
     "projectId": 4,
-    "authorUserId": 7,
-    "assignedUserId": 8
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 5,
@@ -61,8 +61,8 @@
     "startDate": "2023-04-20T00:00:00Z",
     "dueDate": "2023-10-20T00:00:00Z",
     "projectId": 5,
-    "authorUserId": 9,
-    "assignedUserId": 10
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 6,
@@ -74,8 +74,8 @@
     "startDate": "2023-03-01T00:00:00Z",
     "dueDate": "2023-08-01T00:00:00Z",
     "projectId": 6,
-    "authorUserId": 11,
-    "assignedUserId": 12
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 7,
@@ -87,8 +87,8 @@
     "startDate": "2023-05-15T00:00:00Z",
     "dueDate": "2023-11-15T00:00:00Z",
     "projectId": 7,
-    "authorUserId": 13,
-    "assignedUserId": 14
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 8,
@@ -100,8 +100,8 @@
     "startDate": "2023-04-01T00:00:00Z",
     "dueDate": "2023-10-01T00:00:00Z",
     "projectId": 8,
-    "authorUserId": 15,
-    "assignedUserId": 16
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 9,
@@ -113,8 +113,8 @@
     "startDate": "2023-06-10T00:00:00Z",
     "dueDate": "2023-12-10T00:00:00Z",
     "projectId": 9,
-    "authorUserId": 17,
-    "assignedUserId": 18
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 10,
@@ -126,8 +126,8 @@
     "startDate": "2023-07-05T00:00:00Z",
     "dueDate": "2024-01-05T00:00:00Z",
     "projectId": 10,
-    "authorUserId": 19,
-    "assignedUserId": 20
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 11,
@@ -139,8 +139,8 @@
     "startDate": "2023-01-20T00:00:00Z",
     "dueDate": "2023-05-20T00:00:00Z",
     "projectId": 5,
-    "authorUserId": 1,
-    "assignedUserId": 3
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 12,
@@ -152,8 +152,8 @@
     "startDate": "2023-02-10T00:00:00Z",
     "dueDate": "2023-06-10T00:00:00Z",
     "projectId": 1,
-    "authorUserId": 2,
-    "assignedUserId": 4
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 13,
@@ -165,8 +165,8 @@
     "startDate": "2023-03-15T00:00:00Z",
     "dueDate": "2023-07-15T00:00:00Z",
     "projectId": 2,
-    "authorUserId": 5,
-    "assignedUserId": 6
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 14,
@@ -178,8 +178,8 @@
     "startDate": "2023-04-05T00:00:00Z",
     "dueDate": "2023-08-05T00:00:00Z",
     "projectId": 3,
-    "authorUserId": 7,
-    "assignedUserId": 8
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 15,
@@ -191,8 +191,8 @@
     "startDate": "2023-05-01T00:00:00Z",
     "dueDate": "2023-09-01T00:00:00Z",
     "projectId": 4,
-    "authorUserId": 9,
-    "assignedUserId": 10
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 16,
@@ -204,8 +204,8 @@
     "startDate": "2023-06-15T00:00:00Z",
     "dueDate": "2023-10-15T00:00:00Z",
     "projectId": 5,
-    "authorUserId": 11,
-    "assignedUserId": 12
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 17,
@@ -217,8 +217,8 @@
     "startDate": "2023-07-10T00:00:00Z",
     "dueDate": "2023-11-10T00:00:00Z",
     "projectId": 6,
-    "authorUserId": 13,
-    "assignedUserId": 14
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 18,
@@ -230,8 +230,8 @@
     "startDate": "2023-08-05T00:00:00Z",
     "dueDate": "2023-12-05T00:00:00Z",
     "projectId": 7,
-    "authorUserId": 15,
-    "assignedUserId": 16
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 19,
@@ -243,8 +243,8 @@
     "startDate": "2023-09-01T00:00:00Z",
     "dueDate": "2024-01-01T00:00:00Z",
     "projectId": 8,
-    "authorUserId": 17,
-    "assignedUserId": 18
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 20,
@@ -256,8 +256,8 @@
     "startDate": "2023-10-10T00:00:00Z",
     "dueDate": "2024-02-10T00:00:00Z",
     "projectId": 9,
-    "authorUserId": 19,
-    "assignedUserId": 20
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 21,
@@ -269,8 +269,8 @@
     "startDate": "2023-01-30T00:00:00Z",
     "dueDate": "2023-05-30T00:00:00Z",
     "projectId": 10,
-    "authorUserId": 1,
-    "assignedUserId": 3
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 22,
@@ -282,8 +282,8 @@
     "startDate": "2023-02-20T00:00:00Z",
     "dueDate": "2023-06-20T00:00:00Z",
     "projectId": 1,
-    "authorUserId": 2,
-    "assignedUserId": 4
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 23,
@@ -295,8 +295,8 @@
     "startDate": "2023-03-25T00:00:00Z",
     "dueDate": "2023-07-25T00:00:00Z",
     "projectId": 2,
-    "authorUserId": 5,
-    "assignedUserId": 6
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 24,
@@ -308,8 +308,8 @@
     "startDate": "2023-04-15T00:00:00Z",
     "dueDate": "2023-08-15T00:00:00Z",
     "projectId": 3,
-    "authorUserId": 7,
-    "assignedUserId": 8
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 25,
@@ -321,8 +321,8 @@
     "startDate": "2023-05-05T00:00:00Z",
     "dueDate": "2023-09-05T00:00:00Z",
     "projectId": 4,
-    "authorUserId": 9,
-    "assignedUserId": 10
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 26,
@@ -334,8 +334,8 @@
     "startDate": "2023-06-25T00:00:00Z",
     "dueDate": "2023-10-25T00:00:00Z",
     "projectId": 5,
-    "authorUserId": 11,
-    "assignedUserId": 12
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 27,
@@ -347,8 +347,8 @@
     "startDate": "2023-07-20T00:00:00Z",
     "dueDate": "2023-11-20T00:00:00Z",
     "projectId": 6,
-    "authorUserId": 13,
-    "assignedUserId": 14
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 28,
@@ -360,8 +360,8 @@
     "startDate": "2023-08-15T00:00:00Z",
     "dueDate": "2023-12-15T00:00:00Z",
     "projectId": 7,
-    "authorUserId": 15,
-    "assignedUserId": 16
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 29,
@@ -373,8 +373,8 @@
     "startDate": "2023-09-10T00:00:00Z",
     "dueDate": "2024-01-10T00:00:00Z",
     "projectId": 8,
-    "authorUserId": 17,
-    "assignedUserId": 18
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 30,
@@ -386,8 +386,8 @@
     "startDate": "2023-10-15T00:00:00Z",
     "dueDate": "2024-02-15T00:00:00Z",
     "projectId": 9,
-    "authorUserId": 19,
-    "assignedUserId": 20
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 31,
@@ -399,8 +399,8 @@
     "startDate": "2023-11-01T00:00:00Z",
     "dueDate": "2024-03-01T00:00:00Z",
     "projectId": 10,
-    "authorUserId": 20,
-    "assignedUserId": 1
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 32,
@@ -412,8 +412,8 @@
     "startDate": "2023-11-05T00:00:00Z",
     "dueDate": "2024-01-05T00:00:00Z",
     "projectId": 1,
-    "authorUserId": 2,
-    "assignedUserId": 3
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 33,
@@ -425,8 +425,8 @@
     "startDate": "2023-11-10T00:00:00Z",
     "dueDate": "2024-02-10T00:00:00Z",
     "projectId": 2,
-    "authorUserId": 4,
-    "assignedUserId": 5
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 34,
@@ -438,8 +438,8 @@
     "startDate": "2023-11-15T00:00:00Z",
     "dueDate": "2024-03-15T00:00:00Z",
     "projectId": 3,
-    "authorUserId": 6,
-    "assignedUserId": 7
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 35,
@@ -451,8 +451,8 @@
     "startDate": "2023-11-20T00:00:00Z",
     "dueDate": "2024-01-20T00:00:00Z",
     "projectId": 4,
-    "authorUserId": 8,
-    "assignedUserId": 9
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 36,
@@ -464,8 +464,8 @@
     "startDate": "2023-11-25T00:00:00Z",
     "dueDate": "2024-01-25T00:00:00Z",
     "projectId": 5,
-    "authorUserId": 10,
-    "assignedUserId": 11
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 37,
@@ -477,8 +477,8 @@
     "startDate": "2023-12-01T00:00:00Z",
     "dueDate": "2024-02-01T00:00:00Z",
     "projectId": 6,
-    "authorUserId": 12,
-    "assignedUserId": 13
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 38,
@@ -490,8 +490,8 @@
     "startDate": "2023-12-05T00:00:00Z",
     "dueDate": "2024-02-05T00:00:00Z",
     "projectId": 7,
-    "authorUserId": 14,
-    "assignedUserId": 15
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 39,
@@ -503,8 +503,8 @@
     "startDate": "2023-12-10T00:00:00Z",
     "dueDate": "2024-02-10T00:00:00Z",
     "projectId": 8,
-    "authorUserId": 16,
-    "assignedUserId": 17
+    "authorUserId": null,
+    "assignedUserId": null
   },
   {
     "id": 40,
@@ -516,7 +516,7 @@
     "startDate": "2023-12-15T00:00:00Z",
     "dueDate": "2024-02-15T00:00:00Z",
     "projectId": 9,
-    "authorUserId": 18,
-    "assignedUserId": 19
+    "authorUserId": null,
+    "assignedUserId": null
   }
 ]
