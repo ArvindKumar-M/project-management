@@ -29,12 +29,12 @@ async function main() {
     "projectTeam.json",
     "user.json",
     "task.json",
+    "taskAssignment.json",
     "attachment.json",
     "comment.json",
-    "taskAssignment.json",
   ];
 
-  await deleteAllData(orderedFileNames);
+  await deleteAllData(orderedFileNames.reverse()); //Ensure tasks are deleted before projects
 
   for (const fileName of orderedFileNames) {
     const filePath = path.join(dataDirectory, fileName);
