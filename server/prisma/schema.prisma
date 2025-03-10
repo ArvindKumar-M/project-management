@@ -67,11 +67,11 @@ model Task {
   dueDate        DateTime?
   points         Int?
   projectId      Int
-  authorUserId   Int?
+  authorUserId   Int
   assignedUserId Int?
 
   project         Project          @relation(fields: [projectId], references: [id])
-  author          User?             @relation("TaskAuthor", fields: [authorUserId], references: [userId])
+  author          User             @relation("TaskAuthor", fields: [authorUserId], references: [userId])
   assignee        User?            @relation("TaskAssignee", fields: [assignedUserId], references: [userId])
   taskAssignments TaskAssignment[]
   attachments     Attachment[]
