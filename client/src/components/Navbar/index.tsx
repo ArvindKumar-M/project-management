@@ -87,7 +87,7 @@ const Navbar = () => {
             )}
           </div>
           <span className="mx-3 font-semibold text-gray-800 dark:text-white">
-            {capitalizeFirstLetter(currentUserDetails?.username)}
+            {capitalizeFirstLetter(currentUserDetails?.username ?? "")}
           </span>
           <button
             className="hidden rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block"
