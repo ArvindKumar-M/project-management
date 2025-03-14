@@ -1,4 +1,8 @@
-import { useGetTasksQuery, useUpdateTaskStatusMutation } from "@/state/api";
+import {
+  useDeleteTaskMutation,
+  useGetTasksQuery,
+  useUpdateTaskStatusMutation,
+} from "@/state/api";
 import React, { MouseEvent, useState } from "react";
 import {
   DndProvider,
@@ -9,12 +13,20 @@ import {
 } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Task as TaskType } from "@/state/api";
-import { EllipsisVertical, MessageSquareMore, Plus, X } from "lucide-react";
+import {
+  Ellipsis,
+  EllipsisVertical,
+  MessageSquareMore,
+  Plus,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import Popover from "@mui/material/Popover";
 import Loading from "@/components/Loading";
 import ErrorAlert from "@/components/ErrorAlert";
 import { formatDate } from "@/lib/utils";
+import ActionPopper from "@/components/ActionPopper";
+import ModalEditTask from "@/components/ModalEditTask";
 
 type BoardProps = {
   id: string;
@@ -22,6 +34,7 @@ type BoardProps = {
 };
 
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Completed"];
+
 const Board = ({ id, setIsModalNewTaskOpen }: BoardProps) => {
   const {
     data: tasks,
@@ -29,9 +42,16 @@ const Board = ({ id, setIsModalNewTaskOpen }: BoardProps) => {
     error,
   } = useGetTasksQuery({ projectId: Number(id) });
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
+  const [isModalEditTaskOpen, setIsModalEditTaskOpen] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
 
   const moveTask = (taskId: number, toStatus: string) => {
     updateTaskStatus({ taskId, status: toStatus });
+  };
+
+  const handleEdit = (taskId: number) => {
+    setSelectedTaskId(taskId);
+    setIsModalEditTaskOpen(true);
   };
 
   if (isLoading) return <Loading />;
@@ -41,19 +61,29 @@ const Board = ({ id, setIsModalNewTaskOpen }: BoardProps) => {
     );
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 xl:grid-cols-4">
-        {taskStatus.map((status) => (
-          <TaskColumn
-            key={status}
-            status={status}
-            tasks={tasks || []}
-            moveTask={moveTask}
-            setIsModalNewTaskOpen={setIsModalNewTaskOpen}
-          />
-        ))}
-      </div>
-    </DndProvider>
+    <>
+      <DndProvider backend={HTML5Backend}>
+        <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 xl:grid-cols-4">
+          {taskStatus.map((status) => (
+            <TaskColumn
+              key={status}
+              status={status}
+              tasks={tasks || []}
+              moveTask={moveTask}
+              setIsModalNewTaskOpen={setIsModalNewTaskOpen}
+              handleEdit={handleEdit}
+            />
+          ))}
+        </div>
+      </DndProvider>
+      <ModalEditTask
+        tasks={tasks || []}
+        projectId={id}
+        taskId={selectedTaskId}
+        isOpen={isModalEditTaskOpen}
+        onClose={() => setIsModalEditTaskOpen(false)}
+      />
+    </>
   );
 };
 
@@ -62,12 +92,15 @@ type TaskColumnProps = {
   tasks: TaskType[];
   moveTask: (taskId: number, toStatus: string) => void;
   setIsModalNewTaskOpen: (isOpen: boolean) => void;
+  handleEdit: (taskId: number) => void;
 };
+
 const TaskColumn = ({
   status,
   tasks,
   moveTask,
   setIsModalNewTaskOpen,
+  handleEdit,
 }: TaskColumnProps) => {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "task",
@@ -123,7 +156,7 @@ const TaskColumn = ({
       {tasks
         .filter((task) => task.status === status)
         .map((task) => (
-          <Task key={task.id} task={task} />
+          <Task key={task.id} task={task} handleEdit={handleEdit} />
         ))}
     </div>
   );
@@ -131,11 +164,13 @@ const TaskColumn = ({
 
 type TaskProps = {
   task: TaskType;
+  handleEdit: (taskId: number) => void;
 };
 
-const Task = ({ task }: TaskProps) => {
+const Task = ({ task, handleEdit }: TaskProps) => {
   const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "task",
     item: { id: task.id },
@@ -143,6 +178,7 @@ const Task = ({ task }: TaskProps) => {
       isDragging: !!monitor.isDragging(),
     }),
   }));
+  const [deleteTask] = useDeleteTaskMutation();
 
   const taskTagsSplit = task.tags ? task.tags.split(",") : [];
   const numberOfComments = (task.comments && task.comments.length) || 0;
@@ -167,6 +203,14 @@ const Task = ({ task }: TaskProps) => {
         {priority}
       </div>
     );
+  };
+
+  const handleDeleteTask = async (taskId: number) => {
+    await deleteTask(taskId);
+  };
+
+  const handleToggle = (event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
   };
 
   const CommentsModal = () => {
@@ -249,9 +293,20 @@ const Task = ({ task }: TaskProps) => {
               ))}
             </div>
           </div>
-          <button className="flex h-6 w-4 flex-shrink items-center justify-center dark:text-neutral-500">
-            <EllipsisVertical size={26} />
+
+          <button
+            className="flex flex-shrink items-center justify-center dark:text-neutral-500"
+            onClick={handleToggle}
+          >
+            <Ellipsis size={16} />
           </button>
+          <ActionPopper
+            anchorEl={anchorEl}
+            id={task.id}
+            onDelete={() => handleDeleteTask(task.id)}
+            onClose={() => setAnchorEl(null)}
+            onEdit={() => handleEdit(task.id)}
+          />
         </div>
         <div className="my-3 flex justify-between">
           <h4 className="tetx-md font-bold dark:text-white">{task.title}</h4>

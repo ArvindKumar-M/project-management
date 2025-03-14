@@ -67,10 +67,10 @@ const ProjectHeader = ({ activeTab, setActiveTab }: Props) => {
           />
         </div>
         <div className="flex items-center gap-2">
-          <button className="dark:hover:t text-gray-500 hover:text-gray-600 dark:text-neutral-500 dark:hover:text-gray-300">
+          <button className="text-gray-500 hover:text-gray-600 dark:text-neutral-500 dark:hover:text-gray-300">
             <Filter className="h-5 w-5" />
           </button>
-          <button className="dark:hover:t text-gray-500 hover:text-gray-600 dark:text-neutral-500 dark:hover:text-gray-300">
+          <button className="text-gray-500 hover:text-gray-600 dark:text-neutral-500 dark:hover:text-gray-300">
             <Share2 className="h-5 w-5" />
           </button>
           <div className="relative">

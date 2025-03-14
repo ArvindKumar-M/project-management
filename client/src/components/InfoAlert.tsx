@@ -6,10 +6,10 @@ type Props = {
 
 const InfoAlert = ({ message }: Props) => {
   return (
-    <div className="w-1/2 space-y-2 p-8">
+    <div className="inline-block space-y-2 p-8">
       <div
         role="alert"
-        className="p- flex transform items-center rounded-lg border-l-4 border-blue-500 bg-blue-100 p-4 text-blue-900 transition duration-300 ease-in-out hover:scale-105 hover:bg-blue-200 dark:border-blue-700 dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800"
+        className="flex transform items-center rounded-lg border-l-4 border-blue-500 bg-blue-100 p-4 text-blue-900 transition duration-300 ease-in-out hover:scale-105 hover:bg-blue-200 dark:border-blue-700 dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800"
       >
         <svg
           stroke="currentColor"

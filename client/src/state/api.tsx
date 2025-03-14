@@ -1,5 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
+import {
+  fetchAuthSession,
+  fetchUserAttributes,
+  getCurrentUser,
+} from "aws-amplify/auth";
+import { result } from "lodash";
 
 export interface Project {
   id: number;
@@ -27,10 +32,10 @@ export enum Priority {
 export interface User {
   userId?: number;
   username: string;
-  email: string;
+  email?: string | null;
   profilePictureUrl?: string;
-  cognitoId?: string;
-  teamId?: number;
+  cognitoId?: string | null;
+  teamId?: number | null;
 }
 
 export interface Attachment {
@@ -59,7 +64,7 @@ export interface Task {
   dueDate?: string;
   points?: string;
   projectId: number;
-  authorUserId?: number;
+  authorUserId?: string;
   assignedUserId?: number;
 
   author?: User;
@@ -93,6 +98,17 @@ export interface Teams {
   productOwnerUserId?: number;
   projectManagerUserId?: number;
 }
+export interface EditTask {
+  title: string;
+  description?: string;
+  status?: Status;
+  priority?: Priority;
+  tags?: string;
+  startDate?: string;
+  dueDate?: string;
+  points?: string;
+  assignedUserId?: number;
+}
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
@@ -110,15 +126,55 @@ export const api = createApi({
   tagTypes: ["Projects", "Tasks", "Users", "Teams"],
   endpoints: (build) => ({
     getAuthUser: build.query({
-      queryFn: async (_, _queryApi, _extraoptions, fetchWithBQ) => {
-        const user = await getCurrentUser();
-        const session = await fetchAuthSession();
-        if (!session) throw new Error("No session found");
-        const { userSub } = session;
+      queryFn: async (_, queryApi, extraOptions, fetchWithBQ) => {
+        try {
+          const user = await getCurrentUser();
+          const session = await fetchAuthSession();
+          if (!session) throw new Error("No session found");
 
-        const userDetailsResponse = await fetchWithBQ(`users/${userSub}`);
-        const userDetails = userDetailsResponse.data as User;
-        return { data: { user, userSub, userDetails } };
+          const { userSub } = session;
+
+          // Get user attributes including email from Cognito
+          // This is the proper way to access user attributes in AWS Amplify
+          const attributes = await fetchUserAttributes();
+          const email = attributes.email;
+
+          // Try to get existing user
+          const userDetailsResponse = await fetchWithBQ(`users/${userSub}`);
+
+          // If user doesn't exist in your database yet (first login)
+          if (userDetailsResponse.error) {
+            // Create new user with Cognito ID
+            const createUserResponse = await fetchWithBQ({
+              url: "users",
+              method: "POST",
+              body: {
+                username: user.username,
+                cognitoId: userSub,
+                email: email, // Use email from fetchUserAttributes
+              },
+            });
+
+            // Type-safe check for the response
+            const responseData = createUserResponse.data as any;
+            if (responseData && typeof responseData === "object") {
+              return {
+                data: {
+                  user,
+                  userSub,
+                  userDetails: responseData.user || responseData.newUser,
+                },
+              };
+            } else {
+              throw new Error("Invalid response format from user creation");
+            }
+          }
+
+          const userDetails = userDetailsResponse.data as User;
+          return { data: { user, userSub, userDetails } };
+        } catch (error) {
+          return { error: { status: 500, data: error } };
+        }
       },
     }),
     getProjects: build.query<Project[], void>({
@@ -135,10 +191,12 @@ export const api = createApi({
     }),
     getTasks: build.query<Task[], { projectId: number }>({
       query: ({ projectId }) => `tasks?projectId=${projectId}`,
-      providesTags: (result) =>
-        result
+      providesTags: (result, error, arg) => [
+        ...(result
           ? result.map(({ id }) => ({ type: "Tasks" as const, id }))
-          : [{ type: "Tasks" as const }],
+          : []),
+        { type: "Tasks", id: arg.projectId },
+      ],
     }),
     getTasksByUser: build.query<Task[], number>({
       query: (userId) => `tasks/user/${userId}`,
@@ -153,7 +211,10 @@ export const api = createApi({
         method: "POST",
         body: task,
       }),
-      invalidatesTags: ["Tasks"],
+      invalidatesTags: (result, error, task) => [
+        { type: "Tasks", id: task.projectId },
+        "Tasks",
+      ],
     }),
     updateTaskStatus: build.mutation<Task, { taskId: number; status: string }>({
       query: ({ taskId, status }) => ({
@@ -164,6 +225,21 @@ export const api = createApi({
       invalidatesTags: (result, error, { taskId }) => [
         { type: "Tasks", id: taskId },
       ],
+    }),
+    deleteTask: build.mutation<Task, number>({
+      query: (id) => ({
+        url: `/tasks/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, id) => [{ type: "Tasks", id }],
+    }),
+    editTask: build.mutation<Task, { id: number; task: EditTask }>({
+      query: ({ id, task }) => ({
+        url: `/tasks/${id}`,
+        method: "PUT",
+        body: task,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "Tasks", id: id }],
     }),
     getUsers: build.query<User[], void>({
       query: () => "users",
@@ -190,4 +266,6 @@ export const {
   useGetTeamsQuery,
   useGetTasksByUserQuery,
   useGetAuthUserQuery,
+  useDeleteTaskMutation,
+  useEditTaskMutation,
 } = api;

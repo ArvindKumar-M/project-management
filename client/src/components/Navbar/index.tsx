@@ -6,6 +6,7 @@ import { setIsDarkMode, setIsSidebarCollapsed } from "@/state";
 import { useGetAuthUserQuery } from "@/state/api";
 import { signOut } from "aws-amplify/auth";
 import Image from "next/image";
+import { capitalizeFirstLetter } from "@/lib/utils";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
@@ -21,6 +22,7 @@ const Navbar = () => {
       console.error("Error signing out: ", error);
     }
   };
+
   if (!currentUser) return null;
   const currentUserDetails = currentUser?.userDetails;
   return (
@@ -84,8 +86,8 @@ const Navbar = () => {
               <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
             )}
           </div>
-          <span className="mx-3 text-gray-800 dark:text-white">
-            {currentUserDetails?.username}
+          <span className="mx-3 font-semibold text-gray-800 dark:text-white">
+            {capitalizeFirstLetter(currentUserDetails?.username)}
           </span>
           <button
             className="hidden rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block"

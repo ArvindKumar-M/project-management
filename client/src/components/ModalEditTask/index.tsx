@@ -1,49 +1,35 @@
 import {
   Status,
   Priority,
-  useCreateTaskMutation,
   useGetAuthUserQuery,
+  useEditTaskMutation,
+  Task,
 } from "@/state/api";
 import { formatISO, isValid } from "date-fns";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import Modal from "../Modal";
+import { formatDateForInput } from "@/lib/utils";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  id?: string | null;
+  taskId?: number | null;
+  tasks: Task[];
 };
 
-const INITIAL_TASK_DATA = {
-  title: "",
-  description: "",
-  status: Status.ToDo,
-  priority: Priority.Backlog,
-  tags: "",
-  startDate: "",
-  dueDate: "",
-  assignedUserId: "",
-  projectId: "",
-};
-
-const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
-  const [createTask, { isLoading }] = useCreateTaskMutation();
-  const { data: currentUser } = useGetAuthUserQuery({});
-  const [newTaskData, setNewTaskData] = useState(INITIAL_TASK_DATA);
-
-  const authorUserId = currentUser?.userDetails?.cognitoId;
+const ModalEditTask = ({ isOpen, onClose, taskId, tasks }: Props) => {
+  const [editTask, { isLoading }] = useEditTaskMutation();
+  const taskToEdit = tasks.find((task) => task.id === taskId);
+  const [editTaskData, setEditTaskData] = useState<Task | null>(
+    taskToEdit || null,
+  );
 
   const handleSubmit = async () => {
-    if (
-      !newTaskData.title ||
-      !authorUserId ||
-      !(id !== null || newTaskData.projectId)
-    )
-      return;
+    if (!editTaskData || !editTaskData.id) return;
 
     let formattedStartDate: string | undefined = undefined;
-    if (newTaskData.startDate) {
-      const startDate = new Date(newTaskData.startDate);
+    if (editTaskData.startDate) {
+      const startDate = new Date(editTaskData.startDate);
       if (isValid(startDate)) {
         formattedStartDate = formatISO(startDate, {
           representation: "complete",
@@ -51,31 +37,30 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
       }
     }
     let formattedDueDate: string | undefined = undefined;
-    if (newTaskData.dueDate) {
-      const dueDate = new Date(newTaskData.dueDate);
+    if (editTaskData.dueDate) {
+      const dueDate = new Date(editTaskData.dueDate);
       if (isValid(dueDate)) {
         formattedDueDate = formatISO(dueDate, { representation: "complete" });
       }
     }
-
-    await createTask({
-      title: newTaskData.title,
-      description: newTaskData.description,
-      status: newTaskData.status,
-      priority: newTaskData.priority,
-      tags: newTaskData.tags,
-      startDate: formattedStartDate,
-      dueDate: formattedDueDate,
-      authorUserId,
-      assignedUserId: parseInt(newTaskData.assignedUserId),
-      projectId: id !== null ? Number(id) : Number(newTaskData.projectId),
+    await editTask({
+      id: editTaskData.id,
+      task: {
+        title: editTaskData.title,
+        description: editTaskData.description,
+        status: editTaskData.status,
+        priority: editTaskData.priority,
+        tags: editTaskData.tags,
+        startDate: formattedStartDate,
+        dueDate: formattedDueDate,
+        assignedUserId: editTaskData.assignedUserId,
+      },
     });
-    setNewTaskData(INITIAL_TASK_DATA);
     onClose();
   };
 
   const handleModalClose = () => {
-    setNewTaskData(INITIAL_TASK_DATA);
+    setEditTaskData(taskToEdit as Task);
     onClose();
   };
 
@@ -83,18 +68,21 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setNewTaskData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setEditTaskData((prevData) => {
+      if (!prevData) return null;
+      return {
+        ...prevData,
+        [name]: value,
+      };
+    });
   };
 
-  const isFormValid = () => {
-    return (
-      newTaskData.title &&
-      authorUserId &&
-      (id !== null || newTaskData.projectId)
-    );
+  const hasChanges = () => {
+    if (!taskToEdit || !editTaskData) return null;
+
+    return Object.keys(taskToEdit).some((key) => {
+      return taskToEdit[key as keyof Task] !== editTaskData[key as keyof Task];
+    });
   };
 
   const selectStyles =
@@ -102,8 +90,16 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
   const inputStyles =
     "w-full rounded border border-gray-300 p-2 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none";
 
+  useEffect(() => {
+    if (taskToEdit) {
+      setEditTaskData(taskToEdit);
+    }
+  }, [taskToEdit]);
+
+  if (!taskToEdit) return null;
+
   return (
-    <Modal isOpen={isOpen} onClose={handleModalClose} name="Create New Task">
+    <Modal isOpen={isOpen} onClose={handleModalClose} name="Edit Task">
       <form
         className="mt-4 space-y-6"
         onSubmit={(e) => {
@@ -115,14 +111,14 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
           type="text"
           className={inputStyles}
           name="title"
-          value={newTaskData.title}
+          value={editTaskData?.title ?? ""}
           onChange={handleChange}
           placeholder="Title"
         />
         <textarea
           className={inputStyles}
           name="description"
-          value={newTaskData.description}
+          value={editTaskData?.description ?? ""}
           onChange={handleChange}
           placeholder="Description"
         />
@@ -130,7 +126,7 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
           <select
             className={selectStyles}
             name="status"
-            value={newTaskData.status}
+            value={editTaskData?.status ?? ""}
             onChange={handleChange}
           >
             <option value="">Select Status</option>
@@ -142,7 +138,7 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
           <select
             className={selectStyles}
             name="priority"
-            value={newTaskData.priority}
+            value={editTaskData?.priority ?? ""}
             onChange={handleChange}
           >
             <option value="">Select Priority</option>
@@ -157,7 +153,7 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
           type="text"
           className={inputStyles}
           name="tags"
-          value={newTaskData.tags}
+          value={editTaskData?.tags ?? ""}
           onChange={handleChange}
           placeholder="Tags (comma separated)"
         />
@@ -166,53 +162,35 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
             type="date"
             className={inputStyles}
             name="startDate"
-            value={newTaskData.startDate}
+            value={formatDateForInput(editTaskData?.startDate ?? "")}
             onChange={handleChange}
           />
           <input
             type="date"
             className={inputStyles}
             name="dueDate"
-            value={newTaskData.dueDate}
+            value={formatDateForInput(editTaskData?.dueDate ?? "")}
             onChange={handleChange}
           />
         </div>
-        {/* <input
-          type="text"
-          className={inputStyles}
-          name="authorUserId"
-          value={newTaskData.authorUserId}
-          onChange={handleChange}
-          placeholder="Author User ID"
-        /> */}
         <input
           type="text"
           className={inputStyles}
           name="assignedUserId"
-          value={newTaskData.assignedUserId}
+          value={editTaskData?.assignedUserId ?? ""}
           onChange={handleChange}
           placeholder="Assigned User ID"
         />
-        {id === null && (
-          <input
-            type="text"
-            className={inputStyles}
-            name="projectId"
-            value={newTaskData.projectId}
-            onChange={handleChange}
-            placeholder="Project ID"
-          />
-        )}
         <button
           type="submit"
-          className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline focus:ring-2 focus:ring-blue-600 ${!isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""}`}
-          disabled={!isFormValid() || isLoading}
+          className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline focus:ring-2 focus:ring-blue-600 ${!hasChanges() || isLoading ? "cursor-not-allowed opacity-50" : ""}`}
+          disabled={!hasChanges() || isLoading}
         >
-          {isLoading ? "Creating..." : "Create Task"}
+          {isLoading ? "Saving..." : "Submit"}
         </button>
       </form>
     </Modal>
   );
 };
 
-export default ModalNewTask;
+export default ModalEditTask;

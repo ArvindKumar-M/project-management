@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Loading from "@/components/Loading";
 import { Task, useGetTasksQuery } from "@/state/api";
 import TaskCard from "@/components/TaskCard";
+import InfoAlert from "@/components/InfoAlert";
 
 type ListProps = {
   id: string;
@@ -15,6 +16,12 @@ const ListView = ({ id, setIsModalNewTaskOpen }: ListProps) => {
     isLoading,
   } = useGetTasksQuery({ projectId: Number(id) });
 
+  if (!tasks || tasks.length === 0)
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <InfoAlert message="No tasks in the project" />
+      </div>
+    );
   if (isLoading) return <Loading />;
   if (error)
     return (
