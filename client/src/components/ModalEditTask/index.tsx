@@ -2,6 +2,7 @@ import { Status, Priority, useEditTaskMutation, Task } from "@/state/api";
 import { formatISO, isValid } from "date-fns";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { formatDateForInput } from "@/lib/utils";
+import Modal from "../Modal";
 
 type Props = {
   isOpen: boolean;
