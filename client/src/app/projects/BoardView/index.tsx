@@ -78,7 +78,6 @@ const Board = ({ id, setIsModalNewTaskOpen }: BoardProps) => {
       </DndProvider>
       <ModalEditTask
         tasks={tasks || []}
-        projectId={id}
         taskId={selectedTaskId}
         isOpen={isModalEditTaskOpen}
         onClose={() => setIsModalEditTaskOpen(false)}
