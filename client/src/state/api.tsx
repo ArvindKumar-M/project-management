@@ -4,7 +4,6 @@ import {
   fetchUserAttributes,
   getCurrentUser,
 } from "aws-amplify/auth";
-import { result } from "lodash";
 
 export interface Project {
   id: number;
@@ -110,6 +109,15 @@ export interface EditTask {
   assignedUserId?: number;
 }
 
+type CreateUserResponse = {
+  responseData?: {
+    message: string;
+    user: User;
+  };
+  user?: User;
+  newUser?: User;
+};
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -156,13 +164,16 @@ export const api = createApi({
             });
 
             // Type-safe check for the response
-            const responseData = createUserResponse.data as any;
+            const responseData = createUserResponse.data as CreateUserResponse;
             if (responseData && typeof responseData === "object") {
               return {
                 data: {
                   user,
                   userSub,
-                  userDetails: responseData.user || responseData.newUser,
+                  userDetails:
+                    responseData.responseData?.user ||
+                    responseData.user ||
+                    responseData.newUser,
                 },
               };
             } else {

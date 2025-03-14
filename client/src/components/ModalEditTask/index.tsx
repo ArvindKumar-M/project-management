@@ -1,13 +1,6 @@
-import {
-  Status,
-  Priority,
-  useGetAuthUserQuery,
-  useEditTaskMutation,
-  Task,
-} from "@/state/api";
+import { Status, Priority, useEditTaskMutation, Task } from "@/state/api";
 import { formatISO, isValid } from "date-fns";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import Modal from "../Modal";
 import { formatDateForInput } from "@/lib/utils";
 
 type Props = {
