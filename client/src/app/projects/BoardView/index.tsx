@@ -294,7 +294,7 @@ const Task = ({ task, handleEdit }: TaskProps) => {
           </div>
 
           <button
-            className="flex flex-shrink items-center justify-center dark:text-neutral-500"
+            className="flex flex-shrink cursor-pointer items-center justify-center dark:text-neutral-500"
             onClick={handleToggle}
           >
             <Ellipsis size={16} />
