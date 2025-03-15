@@ -1,7 +1,7 @@
 "use client";
 
-import { useGetUsersQuery } from "@/state/api";
-import React from "react";
+import { useGetAuthUserQuery, useGetUsersQuery } from "@/state/api";
+import React, { useEffect } from "react";
 import { useAppSelector } from "../redux";
 import Loading from "@/components/Loading";
 import ErrorAlert from "@/components/ErrorAlert";
@@ -47,8 +47,15 @@ const columns: GridColDef[] = [
 ];
 
 const Users = () => {
-  const { data: users, isLoading, isError } = useGetUsersQuery();
+  const { data: users, isLoading, isError, refetch } = useGetUsersQuery();
+  const { data: authData } = useGetAuthUserQuery({});
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+
+  useEffect(() => {
+    if (authData?.userDetails) {
+      refetch();
+    }
+  }, [authData, refetch]);
 
   if (isLoading) return <Loading />;
   if (isError && !users) return <ErrorAlert error="Error fetching users" />;

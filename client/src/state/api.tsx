@@ -108,7 +108,6 @@ export interface EditTask {
   points?: string;
   assignedUserId?: number;
 }
-
 type CreateUserResponse = {
   responseData?: {
     message: string;
@@ -131,27 +130,65 @@ export const api = createApi({
     },
   }),
   reducerPath: "api",
-  tagTypes: ["Projects", "Tasks", "Users", "Teams"],
+  tagTypes: ["Projects", "Tasks", "Users", "Teams", "AuthUser"],
   endpoints: (build) => ({
     getAuthUser: build.query({
       queryFn: async (_, queryApi, extraOptions, fetchWithBQ) => {
         try {
-          const user = await getCurrentUser();
+          // Get current AWS Amplify session
           const session = await fetchAuthSession();
           if (!session) throw new Error("No session found");
 
           const { userSub } = session;
 
-          // Get user attributes including email from Cognito
-          // This is the proper way to access user attributes in AWS Amplify
-          const attributes = await fetchUserAttributes();
+          let attributes;
+          try {
+            // Get user attributes including email from Cognito
+            attributes = await fetchUserAttributes();
+          } catch (error) {
+            if (error instanceof Error && "name" in error) {
+              if (error.name === "UserNotFoundException") {
+                console.warn("User not found in Cognito. Logging out...");
+                return {
+                  error: {
+                    status: 401,
+                    data: "User not found. Please re-authenticate.",
+                    logout: true, // <-- Pass logout flag
+                  },
+                };
+              }
+              if (error.name === "NotAuthorizedException") {
+                console.warn("Access Token revoked, clearing user session.");
+                queryApi.dispatch(api.util.invalidateTags(["AuthUser"]));
+                return {
+                  error: {
+                    status: 401,
+                    data: "Session expired. Please log in again.",
+                    logout: true, // <-- Pass logout flag
+                  },
+                };
+              }
+            }
+            throw error;
+          }
           const email = attributes.email;
 
+          const user = await getCurrentUser();
+
           // Try to get existing user
-          const userDetailsResponse = await fetchWithBQ(`users/${userSub}`);
+          let userDetailsResponse;
+          try {
+            userDetailsResponse = await fetchWithBQ({
+              url: `users/${userSub}`,
+              method: "GET",
+              params: { _t: Date.now() }, // Cache busting
+            });
+          } catch (error) {
+            userDetailsResponse = { error };
+          }
 
           // If user doesn't exist in your database yet (first login)
-          if (userDetailsResponse.error) {
+          if (userDetailsResponse.error || !userDetailsResponse.data) {
             // Create new user with Cognito ID
             const createUserResponse = await fetchWithBQ({
               url: "users",
@@ -159,34 +196,40 @@ export const api = createApi({
               body: {
                 username: user.username,
                 cognitoId: userSub,
-                email: email, // Use email from fetchUserAttributes
+                email: email,
               },
             });
 
-            // Type-safe check for the response
+            // Get the user data from response
             const responseData = createUserResponse.data as CreateUserResponse;
-            if (responseData && typeof responseData === "object") {
-              return {
-                data: {
-                  user,
-                  userSub,
-                  userDetails:
-                    responseData.responseData?.user ||
-                    responseData.user ||
-                    responseData.newUser,
-                },
-              };
-            } else {
+            const newUserDetails =
+              responseData?.responseData?.user ||
+              responseData?.user ||
+              responseData?.newUser;
+
+            if (!newUserDetails) {
               throw new Error("Invalid response format from user creation");
             }
+
+            // Important: Invalidate both Users and AuthUser tags
+            queryApi.dispatch(api.util.invalidateTags(["Users", "AuthUser"]));
+            return {
+              data: {
+                user,
+                userSub,
+                userDetails: newUserDetails,
+              },
+            };
           }
 
           const userDetails = userDetailsResponse.data as User;
           return { data: { user, userSub, userDetails } };
         } catch (error) {
+          console.error("Auth user fetch error:", error);
           return { error: { status: 500, data: error } };
         }
       },
+      providesTags: ["AuthUser"],
     }),
     getProjects: build.query<Project[], void>({
       query: () => "projects",
