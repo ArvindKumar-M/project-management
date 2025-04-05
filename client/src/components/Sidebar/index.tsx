@@ -13,7 +13,6 @@ import {
   LockIcon,
   LucideIcon,
   Search,
-  Settings,
   ShieldAlert,
   User,
   Users,
@@ -61,7 +60,7 @@ const Sidebar = () => {
         {/* Top logo */}
         <div className="z-50 flex min-h-[65px] w-64 items-center justify-between bg-white px-6 pt-3 dark:bg-black">
           <div className="tetx-xl font-bold text-gray-800 dark:text-white">
-            AKLIST
+            {currentUserDetails.username.toUpperCase()} LIST
           </div>
           {isSidebarCollapsed ? null : (
             <button
@@ -84,7 +83,7 @@ const Sidebar = () => {
           />
           <div>
             <h3 className="text-md font-bold tracking-wide dark:text-gray-200">
-              ARVIND TEAM
+              {currentUserDetails.username.toUpperCase()} TEAM
             </h3>
             <div className="mt-1 flex items-start gap-2">
               <LockIcon className="mt-[0.1rem] h-3 w-3 text-gray-500 dark:text-gray-400" />
@@ -97,7 +96,6 @@ const Sidebar = () => {
           <SidebarLink icon={Home} href="/" label="Home" />
           <SidebarLink icon={Briefcase} href="/timeline" label="Timeline" />
           <SidebarLink icon={Search} href="/search" label="Search" />
-          <SidebarLink icon={Settings} href="/settings" label="Settings" />
           <SidebarLink icon={User} href="/users" label="Users" />
           <SidebarLink icon={Users} href="/teams" label="Teams" />
         </nav>
@@ -169,10 +167,7 @@ const Sidebar = () => {
             {!!currentUserDetails?.profilePictureUrl ? (
               <Image
                 src={`https://pm-s3-all-images.s3.us-east-1.amazonaws.com/${currentUserDetails?.profilePictureUrl}`}
-                alt={
-                  currentUserDetails?.profilePictureUrl ||
-                  "User Profile Picture"
-                }
+                alt={currentUserDetails?.username || "User Profile Picture"}
                 width={100}
                 height={50}
                 className="h-full rounded-full object-cover"

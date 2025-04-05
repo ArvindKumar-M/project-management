@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@aws-amplify/ui-react": "^6.9.3",
+    "@aws-amplify/ui-react-storage": "^3.9.1",
+    "@aws-sdk/client-s3": "^3.779.0",
+    "@aws-sdk/s3-request-presigner": "^3.779.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^6.4.2",
@@ -29,6 +32,7 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.3.1",
     "react-redux": "^9.2.0",
+    "react-toastify": "^11.0.5",
     "recharts": "^2.15.1",
     "redux-persist": "^6.0.0"
   },

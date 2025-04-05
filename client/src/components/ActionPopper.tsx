@@ -29,7 +29,7 @@ const ActionPopper = ({ id, onDelete, anchorEl, onClose, onEdit }: Props) => {
           <MenuList>
             <MenuItem
               sx={{ color: "#4b5563" }}
-              className="dark:text-neutral-500 dark:hover:text-gray-300"
+              className="dark:text-neutral-300"
               onClick={() => {
                 onEdit(id);
                 onClose();
@@ -47,7 +47,7 @@ const ActionPopper = ({ id, onDelete, anchorEl, onClose, onEdit }: Props) => {
                 onClose();
               }}
               sx={{ color: "#4b5563" }}
-              className="dark:text-neutral-500 dark:hover:text-gray-300"
+              className="dark:text-neutral-300"
             >
               <Trash
                 size={14}

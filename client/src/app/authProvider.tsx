@@ -11,6 +11,12 @@ Amplify.configure({
         process.env.NEXT_PUBLIC_CONGNITO_USER_POOL_CLIENT_ID || "",
     },
   },
+  Storage: {
+    S3: {
+      bucket: process.env.AWS_BUCKET_NAME,
+      region: process.env.AWS_BUCKET_REGION,
+    },
+  },
 });
 
 const formFields = {

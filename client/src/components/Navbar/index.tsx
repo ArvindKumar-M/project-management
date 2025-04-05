@@ -1,12 +1,10 @@
-import React from "react";
-import { Menu, Moon, Search, Settings, Sun, User } from "lucide-react";
-import Link from "next/link";
+import React, { MouseEvent, useState } from "react";
+import { Menu, Moon, Search, Sun, User } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsDarkMode, setIsSidebarCollapsed } from "@/state";
 import { useGetAuthUserQuery } from "@/state/api";
-import { signOut } from "aws-amplify/auth";
 import Image from "next/image";
-import { capitalizeFirstLetter } from "@/lib/utils";
+import ProfilePopper from "../ProfilePopper";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
@@ -15,13 +13,10 @@ const Navbar = () => {
   );
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const { data: currentUser } = useGetAuthUserQuery({});
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error("Error signing out: ", error);
-    }
+  const handleToggle = (event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
   };
 
   if (!currentUser) return null;
@@ -48,7 +43,7 @@ const Navbar = () => {
         </div>
       </div>
       {/* Icons */}
-      <div className="flex items-center">
+      <div className="flex items-center gap-5">
         <button
           onClick={() => dispatch(setIsDarkMode(!isDarkMode))}
           className={
@@ -63,40 +58,30 @@ const Navbar = () => {
             <Moon className="h-6 w-6 cursor-pointer dark:text-white" />
           )}
         </button>
-        <Link
-          href="/settings"
-          className={
-            isDarkMode
-              ? `h-min w-min rounded p-2 dark:hover:bg-gray-700`
-              : `h-min w-min rounded p-2 hover:bg-gray-100`
-          }
-        >
-          <Settings className="h-6 w-6 cursor-pointer dark:text-white" />
-        </Link>
-        <div className="ml-2 mr-5 hidden min-h-[2em] w-[0.1rem] bg-gray-200 md:inline-block"></div>
+        {/* <div className="ml-2 mr-5 hidden min-h-[2em] w-[0.1rem] bg-gray-200 md:inline-block"></div> */}
         <div className="hidden items-center justify-between md:flex">
-          <div className="align-center flex h-9 w-9 justify-center">
-            {!!currentUserDetails?.profilePictureUrl ? (
+          <button
+            className="align-center flex h-12 w-12 cursor-pointer justify-center"
+            onClick={handleToggle}
+          >
+            {currentUserDetails?.profilePictureUrl ? (
               <Image
                 src={`https://pm-s3-all-images.s3.us-east-1.amazonaws.com/${currentUserDetails?.profilePictureUrl}`}
                 alt={currentUserDetails?.username || "User Profile Picture"}
-                width={100}
-                height={50}
+                width={200}
+                height={100}
                 className="h-full rounded-full object-cover"
               />
             ) : (
               <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
             )}
-          </div>
-          <span className="mx-3 font-semibold text-gray-800 dark:text-white">
-            {capitalizeFirstLetter(currentUserDetails?.username ?? "")}
-          </span>
-          <button
-            className="hidden rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block"
-            onClick={handleSignOut}
-          >
-            Sign out
           </button>
+          <ProfilePopper
+            anchorEl={anchorEl}
+            onClose={() => setAnchorEl(null)}
+            profile={currentUserDetails?.profilePictureUrl}
+            username={currentUserDetails?.username}
+          />
         </div>
       </div>
     </div>

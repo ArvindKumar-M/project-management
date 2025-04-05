@@ -3,6 +3,7 @@ import {
   fetchAuthSession,
   fetchUserAttributes,
   getCurrentUser,
+  signOut,
 } from "aws-amplify/auth";
 
 export interface Project {
@@ -31,10 +32,11 @@ export enum Priority {
 export interface User {
   userId?: number;
   username: string;
-  email?: string | null;
+  email: string;
   profilePictureUrl?: string;
   cognitoId?: string | null;
   teamId?: number | null;
+  team?: Team;
 }
 
 export interface Attachment {
@@ -79,7 +81,7 @@ export interface SearchResults {
 }
 
 export interface Team {
-  teamId: number;
+  teamId?: number;
   teamName: string;
   productOwnerUserId?: number;
   projectManagerUserId?: number;
@@ -117,6 +119,31 @@ type CreateUserResponse = {
   newUser?: User;
 };
 
+export interface RootState {
+  auth: {
+    authUser?: {
+      userSub?: string;
+      userId?: string;
+      username?: string;
+      email?: string;
+    };
+  };
+  api: {
+    queries?: {
+      getAuthUser?: {
+        data?: {
+          userDetails?: {
+            userSub?: string;
+            userId?: string;
+            username?: string;
+            email?: string;
+          };
+        };
+      };
+    };
+  };
+}
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -149,6 +176,7 @@ export const api = createApi({
             if (error instanceof Error && "name" in error) {
               if (error.name === "UserNotFoundException") {
                 console.warn("User not found in Cognito. Logging out...");
+                signOut();
                 return {
                   error: {
                     status: 401,
@@ -230,6 +258,18 @@ export const api = createApi({
         }
       },
       providesTags: ["AuthUser"],
+    }),
+    updateUser: build.mutation<User, { userId: number; data: Partial<User> }>({
+      query: ({ userId, data }) => ({
+        url: `users/${userId}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: (result) => [
+        { type: "Users", id: result?.userId },
+        "Users",
+        "AuthUser",
+      ],
     }),
     getProjects: build.query<Project[], void>({
       query: () => "projects",
@@ -322,4 +362,5 @@ export const {
   useGetAuthUserQuery,
   useDeleteTaskMutation,
   useEditTaskMutation,
+  useUpdateUserMutation,
 } = api;

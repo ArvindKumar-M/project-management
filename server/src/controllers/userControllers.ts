@@ -19,6 +19,9 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = await prisma.user.findUnique({
       where: { cognitoId },
+      include: {
+        team: true,
+      },
     });
 
     if (!user) {
@@ -59,14 +62,25 @@ export const postUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    //first, create a tam for the user
+    const teamName = `${username}'s`;
+    const newTeam = await prisma.team.create({
+      data: {
+        teamName,
+      },
+    });
+
     // Create user with provided data or defaults
     const newUser = await prisma.user.create({
       data: {
         username,
         cognitoId,
         email,
-        profilePictureUrl: profilePictureUrl || "i1.jpg",
-        teamId: teamId || null,
+        profilePictureUrl: profilePictureUrl || "",
+        teamId: newTeam.id,
+      },
+      include: {
+        team: true,
       },
     });
 
@@ -85,5 +99,54 @@ export const postUser = async (req: Request, res: Response): Promise<void> => {
     }
 
     res.status(500).json({ message: `Error creating user: ${error.message}` });
+  }
+};
+
+export const updateUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    const { username, profilePictureUrl } = req.body;
+
+    const id = parseInt(userId);
+
+    if (isNaN(id)) {
+      res.status(400).json({ message: "Invalid user ID" });
+      return;
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: { userId: id },
+    });
+
+    if (!existingUser) {
+      res.status(400).json({ message: "User not founs" });
+      return;
+    }
+
+    const updateUSer = await prisma.user.update({
+      where: { userId: id },
+      data: {
+        ...(username ? { username } : {}),
+        ...(profilePictureUrl ? { profilePictureUrl } : {}),
+      },
+    });
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user: updateUSer,
+    });
+  } catch (error: any) {
+    if (error.code === "P2002") {
+      res.status(409).json({
+        message: `User with this ${
+          error.meta?.target?.[0] || "attribute"
+        } already exists`,
+      });
+      return;
+    }
+    res.status(500).json({ message: `Error updating user:${error.message}` });
   }
 };

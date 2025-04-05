@@ -7,6 +7,8 @@ import StoreProvider, { useAppSelector } from "./redux";
 import { useGetProjectsQuery } from "@/state/api";
 import Loading from "@/components/Loading";
 import AuthProvider from "./authProvider";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isSidebarCollapsed = useAppSelector(
@@ -32,6 +34,17 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         <Navbar />
         {children}
         {isLoading && <Loading />}
+        <ToastContainer
+          position="top-center"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </main>
     </div>
   );
