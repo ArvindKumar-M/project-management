@@ -18,10 +18,10 @@ const generateFileName = (bytes = 32) =>
 const maxSize = 1024 * 1024 * 10; //10MB
 
 const s3Client = new S3Client({
-  region: process.env.AWS_BUCKET_REGION!,
+  region: process.env.MY_BUCKET_REGION!,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.MY_ACCESS_KEY!,
+    secretAccessKey: process.env.MY_SECRET_ACCESS_KEY!,
   },
 });
 
@@ -50,7 +50,7 @@ export async function getSignedURL(
   const fileKey = generateFileName();
 
   const putObjectCommand = new PutObjectCommand({
-    Bucket: process.env.AWS_BUCKET_NAME!,
+    Bucket: process.env.MY_BUCKET_NAME!,
     Key: fileKey,
     ContentType: type,
     ContentLength: size,
