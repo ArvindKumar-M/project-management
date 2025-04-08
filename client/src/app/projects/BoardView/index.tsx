@@ -13,13 +13,7 @@ import {
 } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Task as TaskType } from "@/state/api";
-import {
-  Ellipsis,
-  EllipsisVertical,
-  MessageSquareMore,
-  Plus,
-  X,
-} from "lucide-react";
+import { Ellipsis, MessageSquareMore, X } from "lucide-react";
 import Image from "next/image";
 import Popover from "@mui/material/Popover";
 import Loading from "@/components/Loading";
@@ -30,12 +24,11 @@ import ModalEditTask from "@/components/ModalEditTask";
 
 type BoardProps = {
   id: string;
-  setIsModalNewTaskOpen: (isOpen: boolean) => void;
 };
 
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Completed"];
 
-const Board = ({ id, setIsModalNewTaskOpen }: BoardProps) => {
+const Board = ({ id }: BoardProps) => {
   const {
     data: tasks,
     isLoading,
@@ -70,7 +63,6 @@ const Board = ({ id, setIsModalNewTaskOpen }: BoardProps) => {
               status={status}
               tasks={tasks || []}
               moveTask={moveTask}
-              setIsModalNewTaskOpen={setIsModalNewTaskOpen}
               handleEdit={handleEdit}
             />
           ))}
@@ -90,7 +82,6 @@ type TaskColumnProps = {
   status: string;
   tasks: TaskType[];
   moveTask: (taskId: number, toStatus: string) => void;
-  setIsModalNewTaskOpen: (isOpen: boolean) => void;
   handleEdit: (taskId: number) => void;
 };
 
@@ -98,7 +89,6 @@ const TaskColumn = ({
   status,
   tasks,
   moveTask,
-  setIsModalNewTaskOpen,
   handleEdit,
 }: TaskColumnProps) => {
   const [{ isOver }, drop] = useDrop(() => ({
@@ -132,14 +122,8 @@ const TaskColumn = ({
         <div className="flex w-full items-center justify-between rounded-e-lg bg-white px-5 py-4 dark:bg-dark-secondary">
           <h3 className="flex items-center text-lg font-semibold dark:text-white">
             {status}
-            <span
-              className="ml-2 inline-block rounded-full bg-gray-200 p-1 text-center text-sm leading-none dark:bg-dark-tertiary"
-              style={{ width: "1.5rem", height: "1.5rem" }}
-            >
-              {tasksCount}
-            </span>
           </h3>
-          <div className="flex items-center gap-1">
+          {/* <div className="flex items-center gap-1">
             <button className="flex h-6 w-5 items-center justify-center dark:text-neutral-500">
               <EllipsisVertical size={26} />
             </button>
@@ -149,6 +133,14 @@ const TaskColumn = ({
             >
               <Plus size={16} />
             </button>
+          </div> */}
+          <div>
+            <span
+              className="ml-2 inline-block rounded-full bg-gray-200 p-1 text-center text-sm font-semibold leading-none dark:bg-dark-tertiary dark:text-white"
+              style={{ width: "1.5rem", height: "1.5rem" }}
+            >
+              {tasksCount}
+            </span>
           </div>
         </div>
       </div>

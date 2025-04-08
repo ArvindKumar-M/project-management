@@ -24,19 +24,15 @@ const Project = ({ params }: Props) => {
         onClose={() => setIsModalNewTaskOpen(false)}
         id={id}
       />
-      <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
-      {activeTab === "Board" && (
-        <Board id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
-      )}
-      {activeTab === "List" && (
-        <List id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
-      )}
-      {activeTab === "Timeline" && (
-        <Timeline id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
-      )}
-      {activeTab === "Table" && (
-        <Table id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
-      )}
+      <ProjectHeader
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        setIsModalNewTaskOpen={setIsModalNewTaskOpen}
+      />
+      {activeTab === "Board" && <Board id={id} />}
+      {activeTab === "List" && <List id={id} />}
+      {activeTab === "Timeline" && <Timeline id={id} />}
+      {activeTab === "Table" && <Table id={id} />}
     </div>
   );
 };

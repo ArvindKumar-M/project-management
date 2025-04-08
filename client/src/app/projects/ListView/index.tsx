@@ -7,9 +7,8 @@ import InfoAlert from "@/components/InfoAlert";
 
 type ListProps = {
   id: string;
-  setIsModalNewTaskOpen: (isOpen: boolean) => void;
 };
-const ListView = ({ id, setIsModalNewTaskOpen }: ListProps) => {
+const ListView = ({ id }: ListProps) => {
   const {
     data: tasks,
     error,
@@ -31,18 +30,7 @@ const ListView = ({ id, setIsModalNewTaskOpen }: ListProps) => {
   return (
     <div className="px-4 pb-8 xl:px-6">
       <div className="pt-5">
-        <Header
-          name="List"
-          buttonComponent={
-            <button
-              className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-              onClick={() => setIsModalNewTaskOpen(true)}
-            >
-              Add Task
-            </button>
-          }
-          isSmallText
-        />
+        <Header name="List" isSmallText />
       </div>
       <div className="md:gridcols-2 grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
         {tasks?.map((task: Task) => <TaskCard key={task.id} task={task} />)}
