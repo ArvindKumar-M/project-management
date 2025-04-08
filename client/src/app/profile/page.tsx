@@ -62,7 +62,6 @@ const Profile = () => {
   };
 
   const triggerFileInput = () => {
-    console.log("cliced");
     fileInputRef.current?.click();
   };
 
@@ -84,13 +83,18 @@ const Profile = () => {
         }
         const { url, key } = signedURLResult.success;
 
-        await fetch(url, {
+        const response = await fetch(url, {
           method: "PUT",
           body: file,
           headers: {
             "Content-Type": file.type,
           },
+          cache: "no-store",
         });
+
+        if (!response.ok) {
+          throw new Error(`S3 upload failed with status: ${response.status}`);
+        }
 
         await updateUser({
           userId: currentUser?.userDetails.userId,
@@ -134,7 +138,7 @@ const Profile = () => {
             previewImage ||
             (userDetails.profilePictureUrl
               ? `https://pm-s3-all-images.s3.us-east-1.amazonaws.com/${userDetails?.profilePictureUrl}`
-              : "/avatar.png")
+              : "https://pm-s3-all-images.s3.us-east-1.amazonaws.com/avatar.png")
           }
           alt={userDetails.username ?? "Profile picture"}
           width={120}

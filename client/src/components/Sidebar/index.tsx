@@ -164,18 +164,18 @@ const Sidebar = () => {
       <div className="z-10 mt-32 flex w-full flex-col items-center gap-4 bg-white px-8 py-4 dark:bg-black md:hidden">
         <div className="flex w-full items-center">
           <div className="align-center flex h-9 w-9 justify-center">
-            {!!currentUserDetails?.profilePictureUrl ? (
-              <Image
-                src={`https://pm-s3-all-images.s3.us-east-1.amazonaws.com/${currentUserDetails?.profilePictureUrl}`}
-                alt={currentUserDetails?.username || "User Profile Picture"}
-                width={100}
-                height={50}
-                className="h-full rounded-full object-cover"
-                priority
-              />
-            ) : (
-              <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
-            )}
+            <Image
+              src={
+                currentUserDetails.profilePictureUrl
+                  ? `https://pm-s3-all-images.s3.us-east-1.amazonaws.com/${currentUserDetails?.profilePictureUrl}`
+                  : "https://pm-s3-all-images.s3.us-east-1.amazonaws.com/avatar.png"
+              }
+              alt={currentUserDetails?.username || "User Profile Picture"}
+              width={100}
+              height={50}
+              className="h-full rounded-full object-cover"
+              priority
+            />
           </div>
           <span className="mx-3 font-semibold text-gray-800 dark:text-white">
             {capitalizeFirstLetter(currentUserDetails?.username ?? "")}

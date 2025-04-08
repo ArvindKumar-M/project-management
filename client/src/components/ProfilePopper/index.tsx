@@ -45,7 +45,11 @@ const ProfilePopper = ({ anchorEl, onClose, profile, username }: Props) => {
           </button>
           <Box className="flex flex-col items-center pb-3 dark:border-gray-600">
             <Image
-              src={`https://pm-s3-all-images.s3.us-east-1.amazonaws.com/${profile}`}
+              src={
+                profile
+                  ? `https://pm-s3-all-images.s3.us-east-1.amazonaws.com/${profile}`
+                  : "https://pm-s3-all-images.s3.us-east-1.amazonaws.com/avatar.png"
+              }
               alt={username || "User Profile Picture"}
               width={100}
               height={100}

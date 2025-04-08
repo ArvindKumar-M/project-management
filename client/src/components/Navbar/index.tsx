@@ -1,5 +1,5 @@
 import React, { MouseEvent, useState } from "react";
-import { Menu, Moon, Search, Sun, User } from "lucide-react";
+import { Menu, Moon, Search, Sun } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsDarkMode, setIsSidebarCollapsed } from "@/state";
 import { useGetAuthUserQuery } from "@/state/api";
@@ -64,17 +64,17 @@ const Navbar = () => {
             className="align-center flex h-12 w-12 cursor-pointer justify-center"
             onClick={handleToggle}
           >
-            {currentUserDetails?.profilePictureUrl ? (
-              <Image
-                src={`https://pm-s3-all-images.s3.us-east-1.amazonaws.com/${currentUserDetails?.profilePictureUrl}`}
-                alt={currentUserDetails?.username || "User Profile Picture"}
-                width={200}
-                height={100}
-                className="h-full rounded-full object-cover"
-              />
-            ) : (
-              <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
-            )}
+            <Image
+              src={
+                currentUserDetails.profilePictureUrl
+                  ? `https://pm-s3-all-images.s3.us-east-1.amazonaws.com/${currentUserDetails?.profilePictureUrl}`
+                  : "https://pm-s3-all-images.s3.us-east-1.amazonaws.com/avatar.png"
+              }
+              alt={currentUserDetails?.username || "User Profile Picture"}
+              width={200}
+              height={100}
+              className="h-full rounded-full object-cover"
+            />
           </button>
           <ProfilePopper
             anchorEl={anchorEl}
