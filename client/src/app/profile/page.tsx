@@ -89,7 +89,6 @@ const Profile = () => {
           headers: {
             "Content-Type": file.type,
           },
-          cache: "no-store",
         });
 
         if (!response.ok) {

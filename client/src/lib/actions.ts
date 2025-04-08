@@ -18,10 +18,10 @@ const generateFileName = (bytes = 32) =>
 const maxSize = 1024 * 1024 * 10; //10MB
 
 const s3Client = new S3Client({
-  region: process.env.MY_BUCKET_REGION!,
+  region: process.env.NEXT_PUBLIC_BUCKET_REGION!,
   credentials: {
-    accessKeyId: process.env.MY_ACCESS_KEY!,
-    secretAccessKey: process.env.MY_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.NEXT_PUBLIC_ACCESS_KEY!,
+    secretAccessKey: process.env.NEXT_PUBLIC_SECRET_ACCESS_KEY!,
   },
 });
 
@@ -31,40 +31,59 @@ export async function getSignedURL(
   checksum: string,
   userId: number | undefined,
 ): SignedURLResponse {
-  const session = await fetchAuthSession();
-  if (!session) {
-    return { failure: "Not authenticated" };
+  try {
+    const session = await fetchAuthSession();
+    if (!session) {
+      return { failure: "Not authenticated" };
+    }
+    if (userId === undefined) {
+      throw new Error("User ID is required to generate a signed URL.");
+    }
+
+    if (!allowedFileTypes.includes(type)) {
+      return { failure: "Invalid file type" };
+    }
+
+    if (size > maxSize) {
+      return { failure: "File too large" };
+    }
+
+    const fileKey = generateFileName();
+
+    const putObjectCommand = new PutObjectCommand({
+      Bucket: process.env.NEXT_PUBLIC_BUCKET_NAME!,
+      Key: fileKey,
+      ContentType: type,
+      ContentLength: size,
+      ChecksumSHA256: checksum,
+      Metadata: {
+        userId: userId?.toString(),
+      },
+    });
+
+    const url = await getSignedUrl(
+      s3Client,
+      putObjectCommand,
+      { expiresIn: 60 }, // 60 seconds
+    );
+
+    return { success: { url, key: fileKey } };
+  } catch (error) {
+    let message = "Unknown error occurred";
+
+    if (error instanceof Error) {
+      message = error.message;
+    } else if (typeof error === "string") {
+      message = error;
+    } else if (
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error
+    ) {
+      message = String((error as { message?: unknown }).message);
+    }
+
+    console.error("Detailed S3 signing error:", error);
+    return { failure: message };
   }
-  if (userId === undefined) {
-    throw new Error("User ID is required to generate a signed URL.");
-  }
-
-  if (!allowedFileTypes.includes(type)) {
-    return { failure: "Invalid file type" };
-  }
-
-  if (size > maxSize) {
-    return { failure: "File too large" };
-  }
-
-  const fileKey = generateFileName();
-
-  const putObjectCommand = new PutObjectCommand({
-    Bucket: process.env.MY_BUCKET_NAME!,
-    Key: fileKey,
-    ContentType: type,
-    ContentLength: size,
-    ChecksumSHA256: checksum,
-    Metadata: {
-      userId: userId?.toString(),
-    },
-  });
-
-  const url = await getSignedUrl(
-    s3Client,
-    putObjectCommand,
-    { expiresIn: 60 }, // 60 seconds
-  );
-
-  return { success: { url, key: fileKey } };
 }
