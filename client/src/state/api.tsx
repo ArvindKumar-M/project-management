@@ -1,3 +1,4 @@
+import { deleteFileFromS3 } from "@/lib/actions";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import {
   fetchAuthSession,
@@ -271,6 +272,31 @@ export const api = createApi({
         "AuthUser",
       ],
     }),
+    removeProfilePicture: build.mutation<
+      User,
+      { userId: number; profilePictureKey: string }
+    >({
+      query: ({ userId }) => ({
+        url: `users/${userId}/profile-picture`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result) => [
+        { type: "Users", id: result?.userId },
+        "Users",
+        "AuthUser",
+      ],
+
+      //Add an onQueryStarted hooK to  handle the s3 deletion on the client side
+
+      async onQueryStarted({ profilePictureKey }, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          await deleteFileFromS3(profilePictureKey);
+        } catch (error) {
+          console.error("Error handling profile picture removal:", error);
+        }
+      },
+    }),
     getProjects: build.query<Project[], void>({
       query: () => "projects",
       providesTags: ["Projects"],
@@ -363,4 +389,5 @@ export const {
   useDeleteTaskMutation,
   useEditTaskMutation,
   useUpdateUserMutation,
+  useRemoveProfilePictureMutation,
 } = api;

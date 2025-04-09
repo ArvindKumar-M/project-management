@@ -150,3 +150,43 @@ export const updateUser = async (
     res.status(500).json({ message: `Error updating user:${error.message}` });
   }
 };
+
+// In your server-side usercontrollers.ts
+export const removeProfilePicture = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { userId } = req.params;
+
+    const id = parseInt(userId);
+    if (isNaN(id)) {
+      res.status(400).json({ message: "Invalid user ID" });
+      return;
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: { userId: id },
+    });
+
+    if (!existingUser) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    // Update user in database to remove profile picture URL
+    const updatedUser = await prisma.user.update({
+      where: { userId: id },
+      data: { profilePictureUrl: null },
+    });
+
+    res.status(200).json({
+      message: "Profile picture removed successfully",
+      user: updatedUser,
+    });
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: `Error removing profile picture: ${error.message}` });
+  }
+};

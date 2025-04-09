@@ -31,7 +31,7 @@ const ProjectHeader = ({
       />
       <div className="pb-6 pt-6 lg:pb-4 lg:pt-8">
         <Header
-          name="Product Design development"
+          name="Product Design Development"
           buttonComponent={
             <>
               <button

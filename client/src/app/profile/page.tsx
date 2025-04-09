@@ -3,28 +3,35 @@
 import Header from "@/components/Header";
 import Loading from "@/components/Loading";
 import { capitalizeFirstLetter } from "@/lib/utils";
-import { useGetAuthUserQuery, useUpdateUserMutation } from "@/state/api";
+import {
+  useGetAuthUserQuery,
+  useRemoveProfilePictureMutation,
+  useUpdateUserMutation,
+} from "@/state/api";
 import Image from "next/image";
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import "@aws-amplify/ui-react/styles.css";
 import { getSignedURL } from "@/lib/actions";
-import { CloudUpload } from "lucide-react";
+import { Camera, X } from "lucide-react";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 const Profile = () => {
   const { data: currentUser, isLoading } = useGetAuthUserQuery({});
+  const [removeProfilePicture] = useRemoveProfilePictureMutation();
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const [userDetails, setUserDetails] = useState({
     username: "",
     profilePictureUrl: "",
     isUserLoading: false,
   });
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewImage, setpreViewImage] = useState<string | undefined>(
     undefined,
   );
   const [file, setFile] = useState<File | undefined>(undefined);
   const [fileUrl, setFileUrl] = useState<string | undefined>(undefined);
+  const [addedToServer, setAddedToServer] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
@@ -59,10 +66,6 @@ const Profile = () => {
       setFileUrl(undefined);
       setpreViewImage(undefined);
     }
-  };
-
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
   };
 
   const handleSubmit = async () => {
@@ -103,11 +106,61 @@ const Profile = () => {
           },
         });
       }
-
       toast.success("Profile updated successfully");
+      setAddedToServer(true);
     } catch (error) {
       console.error(error);
       toast.error("Failed to update profile");
+    }
+  };
+
+  const handleRemoveProfilePicture = async () => {
+    try {
+      if (previewImage && !addedToServer) {
+        //remove preview without confirmation
+        setFile(undefined);
+        setpreViewImage(undefined);
+        return;
+      }
+
+      //for images already on the server, show confirmation modal
+      if (
+        currentUser?.userDetails.userId &&
+        currentUser.userDetails.profilePictureUrl
+      ) {
+        setShowConfirmModal(true);
+        return;
+      }
+
+      toast.info("No profile picture to remove");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to remove picture");
+    }
+  };
+
+  const confirmRemoveProfilePicture = async () => {
+    try {
+      if (
+        !currentUser?.userDetails.userId ||
+        !currentUser?.userDetails.profilePictureUrl
+      ) {
+        return;
+      }
+
+      await removeProfilePicture({
+        userId: currentUser.userDetails.userId,
+        profilePictureKey: currentUser.userDetails.profilePictureUrl,
+      }).unwrap();
+
+      setFile(undefined);
+      setpreViewImage(undefined);
+      setAddedToServer(false);
+      setShowConfirmModal(false);
+      toast.success("Profile picture removed successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to remove profile picture");
     }
   };
 
@@ -130,99 +183,116 @@ const Profile = () => {
   return (
     <div className="min-h-[500px] w-full max-w-5xl rounded-lg bg-white p-10 dark:bg-dark-secondary">
       <Header name="Profile" />
-      <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-start">
-        <Image
-          key={currentUser?.userDetails?.userId}
-          src={
-            previewImage ||
-            (userDetails.profilePictureUrl
-              ? `https://pm-s3-all-images.s3.us-east-1.amazonaws.com/${userDetails?.profilePictureUrl}`
-              : "https://pm-s3-all-images.s3.us-east-1.amazonaws.com/avatar.png")
-          }
-          alt={userDetails.username ?? "Profile picture"}
-          width={120}
-          height={120}
-          className="h-32 w-32 rounded-lg border border-gray-200 object-cover dark:border-dark-secondary"
-          priority
-        />
-
-        <div
-          className="max flex h-32 w-full max-w-[448px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:bg-gray-900 dark:hover:border-gray-400"
-          onClick={triggerFileInput}
-        >
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            className="hidden"
-          />
-          <button type="button" className="flex flex-col items-center gap-4">
-            <CloudUpload
-              size={20}
-              className="text-gray-500 dark:text-gray-400"
+      <div className="mt-10 flex flex-col gap-10">
+        <div className="flex flex-col gap-4 sm:flex-col">
+          <div className="relative h-52 w-52 rounded-lg bg-gray-100">
+            <Image
+              key={currentUser?.userDetails?.userId}
+              src={
+                previewImage ||
+                (userDetails.profilePictureUrl
+                  ? `https://pm-s3-all-images.s3.us-east-1.amazonaws.com/${userDetails?.profilePictureUrl}`
+                  : "https://pm-s3-all-images.s3.us-east-1.amazonaws.com/avatar.png")
+              }
+              alt={userDetails.username ?? "Profile picture"}
+              width={200}
+              height={200}
+              className="h-full w-full rounded-lg border border-gray-200 object-cover dark:border-dark-secondary"
+              priority
             />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Click to upload
-            </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              PNG, JPG or JPEG (Max. 10MB)
-            </span>
-          </button>
-        </div>
-      </div>
+            <button
+              type="button"
+              className="absolute right-2 top-2 rounded-full bg-gray-200 p-1 shadow transition hover:bg-gray-300"
+              onClick={handleRemoveProfilePicture}
+              disabled={
+                !previewImage && !currentUser?.userDetails.profilePictureUrl
+              }
+            >
+              <X size={14} className="text-gray-600 hover:text-black" />
+            </button>
 
-      {/* Form Section */}
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-6 sm:flex-row">
-          <div className="w-full sm:w-[280px]">
+            <ConfirmationModal
+              isOpen={showConfirmModal}
+              title="Remove Profile Picture"
+              message="Are you Sure you want to remove your profile picture? This action cannot be undone."
+              confirmBtnText="Remove"
+              cancelBtnText="Cancel"
+              onConfirm={confirmRemoveProfilePicture}
+              onCancel={() => setShowConfirmModal(false)}
+            />
+          </div>
+          <div className="w-52 rounded-md border bg-slate-100 p-2 dark:border-gray-600 dark:bg-slate-800">
+            <div className="relative">
+              <input
+                type="file"
+                onChange={handleFileChange}
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="hidden"
+                id="fileUpload"
+              />
+              <label
+                htmlFor="fileUpload"
+                className="flex w-full cursor-pointer items-center gap-3 rounded-md border border-gray-200 bg-white px-4 py-2 text-center text-sm font-semibold text-gray-700 transition-all duration-200 hover:border-gray-400 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500 dark:hover:bg-gray-800"
+              >
+                <Camera size={16} />
+                <span className="inline-block">Add profile picture</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Form Section */}
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6">
+            <div className="w-full sm:w-[480px]">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Name
+              </label>
+              <input
+                type="text"
+                className={`focus:border-none focus:outline-blue-600 ${inputStyles}`}
+                name="username"
+                value={capitalizeFirstLetter(userDetails.username ?? "")}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="w-full sm:w-[480px]">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Email
+              </label>
+              <input
+                type="email"
+                className={inputStyles}
+                name="email"
+                value={currentUser?.userDetails.email ?? ""}
+                readOnly
+              />
+            </div>
+          </div>
+
+          {/* Row: Team Name */}
+          <div className="w-full sm:w-[480px]">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Name
+              Team Name
             </label>
             <input
               type="text"
-              className={`focus:border-none focus:outline-blue-600 ${inputStyles}`}
-              name="username"
-              value={capitalizeFirstLetter(userDetails.username ?? "")}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="w-full sm:w-[280px]">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Email
-            </label>
-            <input
-              type="email"
               className={inputStyles}
-              name="email"
-              value={currentUser?.userDetails.email ?? ""}
+              value={capitalizeFirstLetter(
+                currentUser?.userDetails.team?.teamName || "No Team",
+              )}
               readOnly
             />
           </div>
-        </div>
-
-        {/* Row: Team Name */}
-        <div className="w-full sm:w-[580px]">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Team Name
-          </label>
-          <input
-            type="text"
-            className={inputStyles}
-            value={capitalizeFirstLetter(
-              currentUser?.userDetails.team?.teamName || "No Team",
-            )}
-            readOnly
-          />
-        </div>
-        <div>
-          <button
-            onClick={handleSubmit}
-            disabled={isUpdating}
-            className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
-          >
-            {isUpdating ? "Uploading..." : "Save"}
-          </button>
+          <div>
+            <button
+              onClick={handleSubmit}
+              disabled={isUpdating}
+              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
+            >
+              {isUpdating ? "Uploading..." : "Save"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

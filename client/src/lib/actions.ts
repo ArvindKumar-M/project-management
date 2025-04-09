@@ -1,6 +1,10 @@
 "use server";
 
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { fetchAuthSession } from "aws-amplify/auth";
 import crypto from "crypto";
@@ -85,5 +89,20 @@ export async function getSignedURL(
 
     console.error("Detailed S3 signing error:", error);
     return { failure: message };
+  }
+}
+
+export async function deleteFileFromS3(key: string): Promise<boolean> {
+  try {
+    const deleteCommand = new DeleteObjectCommand({
+      Bucket: process.env.NEXT_PUBLIC_BUCKET_NAME!,
+      Key: key,
+    });
+
+    await s3Client.send(deleteCommand);
+    return true;
+  } catch (error) {
+    console.error("Error deleting file from s3:", error);
+    return false;
   }
 }
