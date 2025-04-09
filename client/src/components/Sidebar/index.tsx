@@ -75,12 +75,14 @@ const Sidebar = () => {
         </div>
         <div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700">
           <Image
-            src="https://pm-s3-all-images.s3.us-east-1.amazonaws.com/Alogo.jpg"
+            src="/logo.png"
             alt="logo"
-            width={45}
-            height={45}
+            width={62}
+            height={62}
             priority
+            className="rounded-lg"
           />
+
           <div>
             <h3 className="text-md font-bold tracking-wide dark:text-gray-200">
               {currentUserDetails.username.toUpperCase()} TEAM
