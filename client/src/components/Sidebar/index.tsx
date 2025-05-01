@@ -80,7 +80,7 @@ const Sidebar = () => {
             width={62}
             height={62}
             priority
-            className="rounded-lg"
+            className="rounded"
           />
 
           <div>
